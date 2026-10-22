@@ -1,1285 +1,208 @@
 <!DOCTYPE html>
-<html lang="ru" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aqtobe Study Hub — Главный EdTech центр в Актобе</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                        },
-                        aqtobe: {
-                            gold: '#f59e0b',
-                            teal: '#14b8a6',
-                            blue: '#0284c7'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .dark .glass {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .dark .gradient-text {
-            background: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .card-hover {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
-
-    <!-- Toast Notification System -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
-
-    <!-- ================= HEADER / NAVBAR ================= -->
-    <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 glass">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            
-            <!-- Logo -->
-            <a href="#" class="flex items-center gap-3 group shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-aqtobe-teal flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform">
-                    A
-                </div>
-                <div>
-                    <span class="font-extrabold text-xl tracking-tight block leading-none">Aqtobe<span class="text-brand-600 dark:text-brand-500">Hub</span></span>
-                    <span class="text-[10px] tracking-widest uppercase font-semibold text-slate-500 dark:text-slate-400 block mt-1">Study & Prep Center</span>
-                </div>
-            </a>
-
-            <!-- Search Bar (Desktop) -->
-            <div class="hidden lg:flex items-center flex-1 max-w-md mx-6 relative">
-                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 text-slate-400"></i>
-                <input type="text" id="header-search" placeholder="Поиск курса (IELTS, SAT, ЕНТ, НИШ)..." 
-                       oninput="handleHeaderSearch(this.value)"
-                       class="w-full pl-10 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
-                <div id="search-dropdown" class="hidden absolute top-12 left-0 right-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 z-50 max-h-80 overflow-y-auto"></div>
-            </div>
-
-            <!-- Navigation Links (Desktop) -->
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <a href="#courses" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Курсы</a>
-                <a href="#calculator" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Калькулятор</a>
-                <a href="#quiz" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Тест</a>
-                <a href="#materials" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Материалы</a>
-                <a href="#branches" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Филиалы</a>
-            </nav>
-
-            <!-- Actions (Theme Toggle & CTA) -->
-            <div class="flex items-center gap-3">
-                <!-- Theme Switcher -->
-                <button id="theme-toggle" onclick="toggleTheme()" aria-label="Переключить тему" class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-                </button>
-
-                <button id="auth-btn" onclick="openAuth()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-lucide="user" class="w-4 h-4"></i><span id="auth-label">Кіру</span></button>
-                <!-- CTA Button -->
-                <button onclick="openModal('consultation')" class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold text-sm text-white bg-gradient-to-r from-brand-600 to-aqtobe-teal hover:opacity-95 shadow-lg shadow-brand-500/20 active:scale-95 transition">
-                    Пробный урок
-                </button>
-
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" aria-label="Меню" class="md:hidden p-2.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Menu Container -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-6 space-y-4 shadow-xl">
-            <div class="relative mb-4">
-                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
-                <input type="text" placeholder="Поиск курса..." oninput="handleHeaderSearch(this.value)" class="w-full pl-10 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
-            </div>
-            <a href="#courses" onclick="toggleMobileMenu()" class="block font-medium py-2 hover:text-brand-500">Все Курсы</a>
-            <a href="#calculator" onclick="toggleMobileMenu()" class="block font-medium py-2 hover:text-brand-500">Калькулятор баллов</a>
-            <a href="#quiz" onclick="toggleMobileMenu()" class="block font-medium py-2 hover:text-brand-500">Подбор курса (Тест)</a>
-            <a href="#materials" onclick="toggleMobileMenu()" class="block font-medium py-2 hover:text-brand-500">Prep Pack (Шпаргалки)</a>
-            <a href="#branches" onclick="toggleMobileMenu()" class="block font-medium py-2 hover:text-brand-500">Филиалы в Актобе</a>
-            <button onclick="toggleMobileMenu(); openModal('consultation');" class="w-full py-3 rounded-xl font-semibold text-white bg-brand-600">Записаться на пробный урок</button>
-        </div>
-    </header>
-
-    <!-- ================= HERO SECTION ================= -->
-    <section class="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-slate-100/60 to-transparent dark:from-slate-900/40 dark:to-transparent">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid lg:grid-cols-12 gap-12 items-center">
-                
-                <!-- Left Text Column -->
-                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300 border border-brand-200 dark:border-brand-800">
-                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-600"></i>
-                        #1 EdTech Платформа в Актобе
-                    </div>
-
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
-                        Твой поступательный качественный рывок в <span class="gradient-text">Aqtobe Study Hub</span>
-                    </h1>
-
-                    <p class="text-base sm:text-lg text-slate-6xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0">
-                        Готовим к IELTS 7.5+, Digital SAT 1500+, ЕНТ 120+ и поступлению в НИШ/БИЛ. Очные занятия в 3 филиалах Актобе и интерактивная онлайн-платформа.
-                    </p>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-                        <button onclick="openModal('consultation')" class="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-500/25 active:scale-95 transition gap-2">
-                            <span>Записаться бесплатно</span>
-                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                        </button>
-                        <a href="#quiz" class="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition gap-2">
-                            <i data-lucide="compass" class="w-5 h-5 text-aqtobe-teal"></i>
-                            <span>Пройти тест подбора</span>
-                        </a>
-                    </div>
-
-                    <!-- Trust Stats -->
-                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-slate-200 dark:border-slate-800 max-w-lg mx-auto lg:mx-0 text-left">
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-brand-600 dark:text-brand-400">2,450+</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Выпускников</div>
-                        </div>
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-aqtobe-teal">7.5 / 1510</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Ср. IELTS / SAT</div>
-                        </div>
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-aqtobe-gold">96%</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Поступаемость</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Feature Widget / Banner -->
-                <div class="lg:col-span-5 relative">
-                    <div class="relative mx-auto max-w-md lg:max-w-none rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-white to-slate-100 dark:from-slate-900 dark:to-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-2xl">
-                        
-                        <div class="flex items-center justify-between mb-6">
-                            <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Набор открыт
-                            </span>
-                            <span class="text-xs text-slate-500 font-medium">Семестр 2026</span>
-                        </div>
-
-                        <!-- Highlight Card Mini -->
-                        <div class="space-y-4">
-                            <div class="p-4 rounded-2xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/60 flex items-start gap-4">
-                                <div class="p-3 rounded-xl bg-brand-600 text-white shrink-0">
-                                    <i data-lucide="award" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm text-slate-900 dark:text-white">Гарантия результата</h4>
-                                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Закрепляем целевой балл в официальном договоре обучения.</p>
-                                </div>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-teal-50/60 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-900/60 flex items-start gap-4">
-                                <div class="p-3 rounded-xl bg-aqtobe-teal text-white shrink-0">
-                                    <i data-lucide="users" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm text-slate-900 dark:text-white">Малые группы до 8 человек</h4>
-                                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Индивидуальный трекинг каждого студента менторами.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Countdown Banner Section -->
-                        <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                            <div class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Ближайший бесплатный мастер-класс:</div>
-                            <div class="font-bold text-sm text-slate-900 dark:text-white mb-3">"Секреты Desmos для Digital SAT Math 800"</div>
-                            
-                            <!-- Timer -->
-                            <div class="grid grid-cols-4 gap-2 text-center" id="webinar-timer">
-                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl">
-                                    <span id="timer-days" class="font-black text-lg text-brand-600 dark:text-brand-400">02</span>
-                                    <span class="block text-[10px] text-slate-500">дней</span>
-                                </div>
-                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl">
-                                    <span id="timer-hours" class="font-black text-lg text-brand-600 dark:text-brand-400">14</span>
-                                    <span class="block text-[10px] text-slate-500">часов</span>
-                                </div>
-                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl">
-                                    <span id="timer-minutes" class="font-black text-lg text-brand-600 dark:text-brand-400">35</span>
-                                    <span class="block text-[10px] text-slate-500">минут</span>
-                                </div>
-                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl">
-                                    <span id="timer-seconds" class="font-black text-lg text-brand-600 dark:text-brand-400">40</span>
-                                    <span class="block text-[10px] text-slate-500">секунд</span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= COURSES CATALOG SECTION ================= -->
-    <section id="courses" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-            <div>
-                <h2 class="text-3xl font-extrabold tracking-tight">Популярные программы подготовки</h2>
-                <p class="text-slate-600 dark:text-slate-400 mt-2">Выберите направление для быстрой и эффективной подготовки в Актобе</p>
-            </div>
-            
-            <!-- Category Tabs -->
-            <div class="flex flex-wrap gap-2" id="course-categories">
-                <button onclick="filterCourses('all')" class="cat-btn active px-4 py-2 rounded-full text-xs font-semibold transition bg-brand-600 text-white">Все</button>
-                <button onclick="filterCourses('international')" class="cat-btn px-4 py-2 rounded-full text-xs font-semibold transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300">IELTS & SAT</button>
-                <button onclick="filterCourses('national')" class="cat-btn px-4 py-2 rounded-full text-xs font-semibold transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300">ЕНТ & НИШ</button>
-                <button onclick="filterCourses('it_skills')" class="cat-btn px-4 py-2 rounded-full text-xs font-semibold transition bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300">IT & Языки</button>
-            </div>
-        </div>
-
-        <!-- Course Cards Grid -->
-        <div id="courses-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Dynamic Injection via JavaScript -->
-        </div>
-    </section>
-
-    <!-- ================= INTERACTIVE SCORE CALCULATOR ================= -->
-    <section id="calculator" class="py-16 bg-slate-100/80 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <span class="text-brand-600 dark:text-brand-400 text-xs font-bold uppercase tracking-wider">Интерактивный сервис</span>
-                <h2 class="text-3xl font-extrabold tracking-tight mt-1">Калькулятор баллов ЕНТ, IELTS и SAT</h2>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Рассчитайте свой текущий и прогнозируемый балл с учетом актуальных критериев оценивания.</p>
-            </div>
-
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
-                
-                <!-- Calculator Type Selector -->
-                <div class="flex rounded-2xl bg-slate-100 dark:bg-slate-800 p-1.5 mb-8">
-                    <button onclick="switchCalcTab('ielts')" id="tab-calc-ielts" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl transition bg-white dark:bg-slate-900 shadow text-brand-600 dark:text-brand-400">IELTS Band Score</button>
-                    <button onclick="switchCalcTab('sat')" id="tab-calc-sat" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl transition text-slate-500 hover:text-slate-900 dark:hover:text-white">Digital SAT</button>
-                    <button onclick="switchCalcTab('ent')" id="tab-calc-ent" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl transition text-slate-500 hover:text-slate-900 dark:hover:text-white">ЕНТ / ҰБТ</button>
-                </div>
-
-                <!-- Calculator Panels Container -->
-                <div id="calc-content">
-                    <!-- Dynamic rendering by JS -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= DIAGNOSTIC QUIZ SECTION ================= -->
-    <section id="quiz" class="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-gradient-to-br from-brand-900 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
-                    <div>
-                        <span class="text-brand-300 text-xs font-bold uppercase tracking-wider">Умный подбор</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold">Тест: Какая программа подходит именно вам?</h2>
-                    </div>
-                    <div id="quiz-step-indicator" class="text-sm font-semibold text-brand-300">Шаг 1 из 3</div>
-                </div>
-
-                <div id="quiz-body">
-                    <!-- Dynamic Quiz Container -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= FREE MATERIALS / PREP PACK ================= -->
-    <section id="materials" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-            <div>
-                <span class="text-aqtobe-teal text-xs font-bold uppercase tracking-wider">Aqtobe Prep Pack</span>
-                <h2 class="text-3xl font-extrabold tracking-tight mt-1">Бесплатные материалы и шпаргалки</h2>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Скачивайте фирменные пособия, разработанные академическим отделом Aqtobe Study Hub</p>
-            </div>
-        </div>
-
-        <div id="materials-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Material 1 -->
-            <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wide">Digital SAT Math</span>
-                    <h3 class="text-lg font-bold mt-1">Desmos Cheat Sheet 2026</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-2">Полное руководство по горячим клавишам и лайфхакам встроенного калькулятора Desmos для решения задач без формул.</p>
-                </div>
-                <button onclick="downloadResource('Desmos Cheat Sheet')" class="mt-6 w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i> Скачать PDF (4.2 MB)
-                </button>
-            </div>
-
-            <!-- Material 2 -->
-            <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
-                        <i data-lucide="book-open" class="w-6 h-6"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">IELTS Writing</span>
-                    <h3 class="text-lg font-bold mt-1">Band 8.0 Essays & Vocabulary</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-2">Сборник образцовых эссе Task 1 & Task 2 с подробным разбором сложной академической лексики и связок.</p>
-                </div>
-                <button onclick="downloadResource('IELTS Essays Collection')" class="mt-6 w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i> Скачать PDF (8.7 MB)
-                </button>
-            </div>
-
-            <!-- Material 3 -->
-            <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4">
-                        <i data-lucide="zap" class="w-6 h-6"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wide">ЕНТ / ҰБТ</span>
-                    <h3 class="text-lg font-bold mt-1">Экспресс-шпаргалка Формул 2026</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-2">Все ключевые формулы по Математической грамотности, Физике и Химии в удобном формате для запоминания.</p>
-                </div>
-                <button onclick="downloadResource('ЕНТ Formulas')" class="mt-6 w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i> Скачать PDF (6.1 MB)
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= AKTOBE BRANCHES SECTION ================= -->
-    <section id="branches" class="py-16 bg-slate-100/80 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-12">
-                <span class="text-brand-600 dark:text-brand-400 text-xs font-bold uppercase tracking-wider">Филиалы в г. Актобе</span>
-                <h2 class="text-3xl font-extrabold tracking-tight mt-1">Учитесь рядом с домом</h2>
-                <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Современные аудитории, оборудованные коворкинги и удобные локации во всех ключевых районах города.</p>
-            </div>
-
-            <div id="branches-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Branch 1 -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                    <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-300 flex items-center justify-center">
-                        <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Центральный филиал</h3>
-                        <p class="text-xs text-slate-500 mt-1">пр. Абылхаир хана, 52 (БЦ "Capital")</p>
-                    </div>
-                    <div class="text-xs space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-                        <div class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-slate-400"></i> Пн-Сб: 09:00 - 20:30</div>
-                        <div class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4 text-slate-400"></i> +7 (7132) 90-45-01</div>
-                        <div class="flex items-center gap-2"><i data-lucide="bus" class="w-4 h-4 text-slate-400"></i> Остановка "Океан"</div>
-                    </div>
-                </div>
-
-                <!-- Branch 2 -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                    <div class="w-10 h-10 rounded-xl bg-aqtobe-teal/20 text-aqtobe-teal flex items-center justify-center">
-                        <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Филиал "Алтын Орда"</h3>
-                        <p class="text-xs text-slate-500 mt-1">мкр. Алтын Орда (Батыс-2), ул. Мустафы Шокая, 14</p>
-                    </div>
-                    <div class="text-xs space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-                        <div class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-slate-400"></i> Пн-Сб: 09:00 - 20:00</div>
-                        <div class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4 text-slate-400"></i> +7 (7132) 90-45-02</div>
-                        <div class="flex items-center gap-2"><i data-lucide="bus" class="w-4 h-4 text-slate-400"></i> Остановка "Академия творчества"</div>
-                    </div>
-                </div>
-
-                <!-- Branch 3 -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                    <div class="w-10 h-10 rounded-xl bg-aqtobe-gold/20 text-aqtobe-gold flex items-center justify-center">
-                        <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Филиал "Молдагуловой"</h3>
-                        <p class="text-xs text-slate-500 mt-1">ул. Алии Молдагуловой, 34/1</p>
-                    </div>
-                    <div class="text-xs space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
-                        <div class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-slate-400"></i> Пн-Сб: 09:00 - 20:00</div>
-                        <div class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4 text-slate-400"></i> +7 (7132) 90-45-03</div>
-                        <div class="flex items-center gap-2"><i data-lucide="bus" class="w-4 h-4 text-slate-400"></i> Остановка "Университет Жубанова"</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= FOOTER ================= -->
-    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-12 text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-black text-sm">A</div>
-                <div>
-                    <span class="font-bold text-slate-900 dark:text-white">Aqtobe Study Hub</span>
-                    <span class="block">Образовательный центр нового поколения в Актобе</span>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap justify-center gap-6">
-                <a href="#courses" class="hover:text-slate-900 dark:hover:text-white">Курсы</a>
-                <a href="#calculator" class="hover:text-slate-900 dark:hover:text-white">Калькулятор</a>
-                <a href="#quiz" class="hover:text-slate-900 dark:hover:text-white">Тест</a>
-                <a href="#materials" class="hover:text-slate-900 dark:hover:text-white">Материалы</a>
-                <a href="#branches" class="hover:text-slate-900 dark:hover:text-white">Филиалы</a>
-            </div>
-
-            <div>
-                © 2026 Aqtobe Study Hub. Все права защищены.
-            </div>
-        </div>
-    </footer>
-
-    <!-- ================= MODALS ================= -->
-    
-    <!-- Modal: Consultation / Registration -->
-    <div id="modal-consultation" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl relative animate-in fade-in zoom-in duration-200">
-            <button onclick="closeModal('consultation')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-1">Запись на пробный урок</h3>
-            <p class="text-xs text-slate-500 mb-6">Оставьте свои данные, и наш координатор в Актобе свяжется с вами в течение 15 минут.</p>
-
-            <form onsubmit="handleConsultationSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Ваше Имя</label>
-                    <input type="text" id="consult-name" required placeholder="Нұрбек" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Телефон (WhatsApp)</label>
-                    <input type="tel" id="consult-phone" required placeholder="+7 (707) 000-00-00" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Интересующее направление</label>
-                    <select id="consult-course" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 outline-none">
-                        <option value="IELTS 7.5+ Booster">IELTS 7.5+ Booster</option>
-                        <option value="Digital SAT 1500+ Prep">Digital SAT 1500+ Prep</option>
-                        <option value="ЕНТ / ҰБТ 120+ Баллов">ЕНТ / ҰБТ 120+ Баллов</option>
-                        <option value="Подготовка в НИШ / БИЛ">Подготовка в НИШ / БИЛ</option>
-                        <option value="Разговорный & Business Qazaqsha">Разговорный & Business Qazaqsha</option>
-                        <option value="Full-Stack Web Dev & Python">Full-Stack Web Dev & Python</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300">Удобный филиал в Актобе</label>
-                    <select id="consult-branch" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 outline-none">
-                        <option value="Абылхаир хана">пр. Абылхаир хана (Центр)</option>
-                        <option value="Алтын Орда">мкр. Алтын Орда (Батыс-2)</option>
-                        <option value="А. Молдагуловой">ул. Алии Молдагуловой</option>
-                        <option value="Онлайн">Онлайн форма обучения</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full py-3.5 mt-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-500/30 transition">
-                    Забронировать место
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Course Details -->
-    <div id="modal-details" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('details')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div id="course-details-content">
-                <!-- Injected via JS -->
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
-    <script>
-        // --- 1. DATA MODELS ---
-        const COURSES = [
-            {
-                id: 'ielts',
-                title: 'IELTS 7.5+ Booster',
-                category: 'international',
-                badge: 'Хит продаж',
-                rating: '4.95',
-                reviewsCount: 340,
-                price: '45,000 ₸ / мес',
-                level: 'Intermediate (B1) +',
-                description: 'Комплексный интенсив по стратегиям Listening, Reading, Academic/General Writing Task 1/2 и реальной практике Speaking cue cards с носителями.',
-                modules: [
-                    'Academic & General Task 2 Structure & Lexicon',
-                    'Speed Reading & Keyword Matching Strategies',
-                    'Listening Trick Detection & Accent Adaptation',
-                    'Live Speaking Simulation & Feedback 1-on-1'
-                ]
-            },
-            {
-                id: 'sat',
-                title: 'Digital SAT 1500+ Prep',
-                category: 'international',
-                badge: 'Топ результат',
-                rating: '4.98',
-                reviewsCount: 215,
-                price: '55,000 ₸ / мес',
-                level: 'Upper-Intermediate',
-                description: 'Глубокая проработка Math section с лайфхаками калькулятора Desmos и раздела Reading & Writing с разбором сложных логических вопросов.',
-                modules: [
-                    'Desmos Graphing Calculator Shortcuts & Hacks',
-                    'SAT Math Hardest Polynomials & Geometry',
-                    'Command of Evidence & Vocabulary in Context',
-                    'Full adaptive Mock Tests on Bluebook'
-                ]
-            },
-            {
-                id: 'ent',
-                title: 'ЕНТ / ҰБТ 120+ Баллов',
-                category: 'national',
-                badge: 'Гарантия Гранта',
-                rating: '4.92',
-                reviewsCount: 480,
-                price: '38,000 ₸ / мес',
-                level: 'Любой уровень',
-                description: 'Подготовка по профильным предметам: Математика, Физика, Химия, Биология, История Казахстана. Авторские методики запоминания.',
-                modules: [
-                    'Математическая грамотность без длинных вычислений',
-                    'Разбор типовых контекстных заданий 2026',
-                    'Еженедельные пробные тестирования в формате НЦТ',
-                    'Психологическая подготовка и тайм-менеджмент'
-                ]
-            },
-            {
-                id: 'nis',
-                title: 'Подготовка в НИШ / БИЛ / КТЛ',
-                category: 'national',
-                badge: 'Детский курс',
-                rating: '4.96',
-                reviewsCount: 190,
-                price: '40,000 ₸ / мес',
-                level: '5-6 классы',
-                description: 'Развитие логики, пространственного мышления, математического анализа и языковых навыков для успешного поступления в интеллектуальные школы.',
-                modules: [
-                    'Логические задачи и наглядно-пространственное мышление',
-                    'Математика повышенной сложности',
-                    'Казахский, Русский и Английский языковые тесты',
-                    'Симуляция конкурсного отбора НИШ'
-                ]
-            },
-            {
-                id: 'qazaqsha',
-                title: 'Разговорный & Business Qazaqsha',
-                category: 'it_skills',
-                badge: 'Быстрый старт',
-                rating: '4.89',
-                reviewsCount: 112,
-                price: '32,000 ₸ / мес',
-                level: 'с нуля до B2',
-                description: 'Преодоление языкового барьера, практика повседневного и делового общения в Актобе, ведение переговоров и документация на казахском языке.',
-                modules: [
-                    'Разговорная практика на актуальные бытовые темы',
-                    'Деловой казахский и деловая переписка',
-                    'Словарный запас и правильное произношение',
-                    'Клуб общения Qazaq Speaking Club'
-                ]
-            },
-            {
-                id: 'webdev',
-                title: 'Full-Stack Web Dev & Python',
-                category: 'it_skills',
-                badge: 'Практический IT',
-                rating: '4.94',
-                reviewsCount: 165,
-                price: '50,000 ₸ / мес',
-                level: 'Для новичков',
-                description: 'Освойте разработку современных веб-сайтов на HTML/CSS/JS, программирование на Python и создание полезных Telegram-ботов для бизнеса.',
-                modules: [
-                    'HTML5, CSS3, Tailwind CSS & JavaScript Fundamentals',
-                    'Python Programming & Basic Algorithms',
-                    'Создание функциональных Telegram-ботов',
-                    'Финал: Защита собственного веб-проекта'
-                ]
-            }
-        ];
-
-        // --- 2. INITIALIZATION & THEME ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initLucide();
-            initTheme();
-            renderCourses(COURSES);
-            renderCalculator('ielts');
-            renderQuizStep(1);
-            startCountdown();
-        });
-
-        function initLucide() {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        function initTheme() {
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        }
-
-        function toggleTheme() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // --- 3. SEARCH & FILTERING ---
-        function handleHeaderSearch(query) {
-            const dropdown = document.getElementById('search-dropdown');
-            if (!query.trim()) {
-                dropdown.classList.add('hidden');
-                return;
-            }
-
-            const filtered = COURSES.filter(c => 
-                c.title.toLowerCase().includes(query.toLowerCase()) || 
-                c.description.toLowerCase().includes(query.toLowerCase())
-            );
-
-            if (filtered.length === 0) {
-                dropdown.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">Курсы не найдены</div>`;
-            } else {
-                dropdown.innerHTML = filtered.map(c => `
-                    <div onclick="openCourseDetails('${c.id}'); document.getElementById('search-dropdown').classList.add('hidden');" class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer flex items-center justify-between transition">
-                        <div>
-                            <div class="text-sm font-bold">${c.title}</div>
-                            <div class="text-[11px] text-slate-500">${c.price}</div>
-                        </div>
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">${c.badge}</span>
-                    </div>
-                `).join('');
-            }
-            dropdown.classList.remove('hidden');
-        }
-
-        function filterCourses(category) {
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.remove('bg-brand-600', 'text-white');
-                btn.classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
-            });
-
-            event.target.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
-            event.target.classList.add('bg-brand-600', 'text-white');
-
-            if (category === 'all') {
-                renderCourses(COURSES);
-            } else {
-                renderCourses(COURSES.filter(c => c.category === category));
-            }
-        }
-
-        function renderCourses(coursesList) {
-            const container = document.getElementById('courses-grid');
-            container.innerHTML = coursesList.map(c => `
-                <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm card-hover flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-950/80 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-900">
-                                ${c.badge}
-                            </span>
-                            <div class="flex items-center text-xs font-bold text-amber-500">
-                                <i data-lucide="star" class="w-3.5 h-3.5 fill-current mr-1"></i>
-                                ${c.rating} <span class="text-slate-400 font-normal ml-1">(${c.reviewsCount})</span>
-                            </div>
-                        </div>
-
-                        <h3 class="text-xl font-bold tracking-tight">${c.title}</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Уровень: ${c.level}</p>
-                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-3 line-clamp-3">${c.description}</p>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="text-lg font-black text-brand-600 dark:text-brand-400 mb-3">${c.price}</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="openCourseDetails('${c.id}')" class="py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                                Подробнее
-                            </button>
-                            <button onclick="openModal('consultation', '${c.title}')" class="py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition">
-                                Записаться
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            initLucide();
-        }
-
-        // --- 4. CALCULATOR LOGIC ---
-        let currentCalcTab = 'ielts';
-
-        function switchCalcTab(tab) {
-            currentCalcTab = tab;
-            ['ielts', 'sat', 'ent'].forEach(t => {
-                const btn = document.getElementById(`tab-calc-${t}`);
-                if (t === tab) {
-                    btn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl transition bg-white dark:bg-slate-900 shadow text-brand-600 dark:text-brand-400";
-                } else {
-                    btn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl transition text-slate-500 hover:text-slate-900 dark:hover:text-white";
-                }
-            });
-            renderCalculator(tab);
-        }
-
-        function renderCalculator(tab) {
-            const container = document.getElementById('calc-content');
-            if (tab === 'ielts') {
-                container.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Listening (Верных ответов из 40): <span id="val-ielts-l" class="text-brand-600 font-black">30</span></label>
-                                <input type="range" min="0" max="40" value="30" oninput="updateIeltsCalc()" id="range-ielts-l" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Reading (Верных ответов из 40): <span id="val-ielts-r" class="text-brand-600 font-black">32</span></label>
-                                <input type="range" min="0" max="40" value="32" oninput="updateIeltsCalc()" id="range-ielts-r" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Writing (Ожидаемый Band Score): <span id="val-ielts-w" class="text-brand-600 font-black">6.5</span></label>
-                                <input type="range" min="4" max="9" step="0.5" value="6.5" oninput="updateIeltsCalc()" id="range-ielts-w" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Speaking (Ожидаемый Band Score): <span id="val-ielts-s" class="text-brand-600 font-black">7.0</span></label>
-                                <input type="range" min="4" max="9" step="0.5" value="7.0" oninput="updateIeltsCalc()" id="range-ielts-s" class="w-full accent-brand-600">
-                            </div>
-                        </div>
-
-                        <div class="bg-brand-50 dark:bg-brand-950/40 p-6 rounded-2xl border border-brand-100 dark:border-brand-900 text-center">
-                            <span class="text-xs font-bold text-brand-600 uppercase">Прогнозируемый Overall Band</span>
-                            <div id="result-ielts-score" class="text-5xl font-black text-brand-600 dark:text-brand-400 my-3">7.0</div>
-                            <p class="text-xs text-slate-500">Отличный результат для поступления в Назарбаев Университет и зарубежные ВУЗы!</p>
-                        </div>
-                    </div>
-                `;
-                updateIeltsCalc();
-            } else if (tab === 'sat') {
-                container.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Math Section Score (200 - 800): <span id="val-sat-m" class="text-brand-600 font-black">760</span></label>
-                                <input type="range" min="200" max="800" step="10" value="760" oninput="updateSatCalc()" id="range-sat-m" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Reading & Writing Score (200 - 800): <span id="val-sat-rw" class="text-brand-600 font-black">720</span></label>
-                                <input type="range" min="200" max="800" step="10" value="720" oninput="updateSatCalc()" id="range-sat-rw" class="w-full accent-brand-600">
-                            </div>
-                        </div>
-
-                        <div class="bg-brand-50 dark:bg-brand-950/40 p-6 rounded-2xl border border-brand-100 dark:border-brand-900 text-center">
-                            <span class="text-xs font-bold text-brand-600 uppercase">Общий Digital SAT Score</span>
-                            <div id="result-sat-score" class="text-5xl font-black text-brand-600 dark:text-brand-400 my-3">1480</div>
-                            <p class="text-xs text-slate-500">Топовый балл для получения стопроцентного гранта в лучшие технические ВУЗы.</p>
-                        </div>
-                    </div>
-                `;
-                updateSatCalc();
-            } else if (tab === 'ent') {
-                container.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Мат. грамотность (макс 10): <span id="val-ent-1" class="text-brand-600 font-black">9</span></label>
-                                <input type="range" min="0" max="10" value="9" oninput="updateEntCalc()" id="range-ent-1" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Грамотность чтения (макс 10): <span id="val-ent-2" class="text-brand-600 font-black">10</span></label>
-                                <input type="range" min="0" max="10" value="10" oninput="updateEntCalc()" id="range-ent-2" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">История Казахстана (макс 20): <span id="val-ent-3" class="text-brand-600 font-black">18</span></label>
-                                <input type="range" min="0" max="20" value="18" oninput="updateEntCalc()" id="range-ent-3" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">1-й Профильный предмет (макс 50): <span id="val-ent-4" class="text-brand-600 font-black">44</span></label>
-                                <input type="range" min="0" max="50" value="44" oninput="updateEntCalc()" id="range-ent-4" class="w-full accent-brand-600">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">2-й Профильный предмет (макс 50): <span id="val-ent-5" class="text-brand-600 font-black">42</span></label>
-                                <input type="range" min="0" max="50" value="42" oninput="updateEntCalc()" id="range-ent-5" class="w-full accent-brand-600">
-                            </div>
-                        </div>
-
-                        <div class="bg-brand-50 dark:bg-brand-950/40 p-6 rounded-2xl border border-brand-100 dark:border-brand-900 text-center">
-                            <span class="text-xs font-bold text-brand-600 uppercase">Итоговый балл ЕНТ / ҰБТ</span>
-                            <div id="result-ent-score" class="text-5xl font-black text-brand-600 dark:text-brand-400 my-3">123 / 140</div>
-                            <p class="text-xs text-slate-500">Высокий шанс прохождения на государственный грант в РК!</p>
-                        </div>
-                    </div>
-                `;
-                updateEntCalc();
-            }
-        }
-
-        function rawToIeltsBand(raw) {
-            if (raw >= 39) return 9.0;
-            if (raw >= 37) return 8.5;
-            if (raw >= 35) return 8.0;
-            if (raw >= 32) return 7.5;
-            if (raw >= 30) return 7.0;
-            if (raw >= 26) return 6.5;
-            if (raw >= 23) return 6.0;
-            if (raw >= 18) return 5.5;
-            if (raw >= 16) return 5.0;
-            return 4.5;
-        }
-
-        function updateIeltsCalc() {
-            const lRaw = parseInt(document.getElementById('range-ielts-l').value);
-            const rRaw = parseInt(document.getElementById('range-ielts-r').value);
-            const wBand = parseFloat(document.getElementById('range-ielts-w').value);
-            const sBand = parseFloat(document.getElementById('range-ielts-s').value);
-
-            document.getElementById('val-ielts-l').innerText = lRaw;
-            document.getElementById('val-ielts-r').innerText = rRaw;
-            document.getElementById('val-ielts-w').innerText = wBand.toFixed(1);
-            document.getElementById('val-ielts-s').innerText = sBand.toFixed(1);
-
-            const lBand = rawToIeltsBand(lRaw);
-            const rBand = rawToIeltsBand(rRaw);
-
-            const avg = (lBand + rBand + wBand + sBand) / 4;
-            // Round to nearest 0.5
-            const overall = (Math.round(avg * 2) / 2).toFixed(1);
-            document.getElementById('result-ielts-score').innerText = overall;
-        }
-
-        function updateSatCalc() {
-            const m = parseInt(document.getElementById('range-sat-m').value);
-            const rw = parseInt(document.getElementById('range-sat-rw').value);
-
-            document.getElementById('val-sat-m').innerText = m;
-            document.getElementById('val-sat-rw').innerText = rw;
-
-            document.getElementById('result-sat-score').innerText = m + rw;
-        }
-
-        function updateEntCalc() {
-            const s1 = parseInt(document.getElementById('range-ent-1').value);
-            const s2 = parseInt(document.getElementById('range-ent-2').value);
-            const s3 = parseInt(document.getElementById('range-ent-3').value);
-            const s4 = parseInt(document.getElementById('range-ent-4').value);
-            const s5 = parseInt(document.getElementById('range-ent-5').value);
-
-            document.getElementById('val-ent-1').innerText = s1;
-            document.getElementById('val-ent-2').innerText = s2;
-            document.getElementById('val-ent-3').innerText = s3;
-            document.getElementById('val-ent-4').innerText = s4;
-            document.getElementById('val-ent-5').innerText = s5;
-
-            const total = s1 + s2 + s3 + s4 + s5;
-            document.getElementById('result-ent-score').innerText = `${total} / 140`;
-        }
-
-        // --- 5. DIAGNOSTIC QUIZ SYSTEM ---
-        let quizAnswers = {};
-
-        function renderQuizStep(step) {
-            document.getElementById('quiz-step-indicator').innerText = `Шаг ${step} из 3`;
-            const container = document.getElementById('quiz-body');
-
-            if (step === 1) {
-                container.innerHTML = `
-                    <p class="text-sm font-semibold mb-4 text-slate-200">Какова ваша главная цель обучения?</p>
-                    <div class="grid sm:grid-cols-2 gap-3">
-                        <button onclick="saveQuizAnswer(1, 'Abroad')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🎓 Поступление в зарубежный ВУЗ / НУ (IELTS/SAT)
-                        </button>
-                        <button onclick="saveQuizAnswer(1, 'ENT')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🏛 Высокий балл на ЕНТ для гранта в РК
-                        </button>
-                        <button onclick="saveQuizAnswer(1, 'NIS')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🏫 Поступление в НИШ / БИЛ (5-6 классы)
-                        </button>
-                        <button onclick="saveQuizAnswer(1, 'IT_Lang')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            💻 Практические IT навыки или Казахский язык
-                        </button>
-                    </div>
-                `;
-            } else if (step === 2) {
-                container.innerHTML = `
-                    <p class="text-sm font-semibold mb-4 text-slate-200">Какой ваш текущий уровень подготовки?</p>
-                    <div class="grid sm:grid-cols-3 gap-3">
-                        <button onclick="saveQuizAnswer(2, 'Beginner')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🌱 Начальный (Beginner / Есть пробелы)
-                        </button>
-                        <button onclick="saveQuizAnswer(2, 'Medium')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            📈 Средний (Intermediate / Нужен буст)
-                        </button>
-                        <button onclick="saveQuizAnswer(2, 'Advanced')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🚀Продвинутый (Нужна отработка тестов)
-                        </button>
-                    </div>
-                `;
-            } else if (step === 3) {
-                container.innerHTML = `
-                    <p class="text-sm font-semibold mb-4 text-slate-200">Сколько времени у вас есть до экзамена/цели?</p>
-                    <div class="grid sm:grid-cols-3 gap-3">
-                        <button onclick="saveQuizAnswer(3, '1-3m')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            ⚡ Срочно (1 - 3 месяца)
-                        </button>
-                        <button onclick="saveQuizAnswer(3, '6m')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            📅 Стандартно (6 месяцев)
-                        </button>
-                        <button onclick="saveQuizAnswer(3, '1y')" class="p-4 rounded-xl text-left bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium text-sm">
-                            🛡 В запасе 1 год и более
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        function saveQuizAnswer(step, val) {
-            quizAnswers[`step${step}`] = val;
-            if (step < 3) {
-                renderQuizStep(step + 1);
-            } else {
-                showQuizResult();
-            }
-        }
-
-        function showQuizResult() {
-            document.getElementById('quiz-step-indicator').innerText = 'Результат';
-            const container = document.getElementById('quiz-body');
-
-            let recommendedId = 'ielts';
-            if (quizAnswers.step1 === 'ENT') recommendedId = 'ent';
-            else if (quizAnswers.step1 === 'NIS') recommendedId = 'nis';
-            else if (quizAnswers.step1 === 'IT_Lang') recommendedId = 'webdev';
-            else if (quizAnswers.step2 === 'Advanced') recommendedId = 'sat';
-
-            const course = COURSES.find(c => c.id === recommendedId);
-
-            container.innerHTML = `
-                <div class="bg-white/10 p-6 rounded-2xl border border-white/20">
-                    <span class="text-xs font-bold text-aqtobe-teal uppercase">Идеальное совпадение:</span>
-                    <h3 class="text-2xl font-bold mt-1 text-white">${course.title}</h3>
-                    <p class="text-xs text-slate-200 mt-2">${course.description}</p>
-                    <div class="mt-4 pt-4 border-t border-white/10 flex items-center justify-between flex-wrap gap-3">
-                        <span class="text-lg font-black text-brand-300">${course.price}</span>
-                        <button onclick="openModal('consultation', '${course.title}')" class="px-6 py-2.5 rounded-xl bg-aqtobe-teal hover:bg-teal-600 text-white font-bold text-xs transition">
-                            Записаться по акции
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- 6. WEBINAR TIMER ---
-        function startCountdown() {
-            let totalSeconds = 2 * 86400 + 14 * 3600 + 35 * 60 + 40;
-            setInterval(() => {
-                if (totalSeconds <= 0) return;
-                totalSeconds--;
-
-                const d = Math.floor(totalSeconds / 86400);
-                const h = Math.floor((totalSeconds % 86400) / 3600);
-                const m = Math.floor((totalSeconds % 3600) / 60);
-                const s = totalSeconds % 60;
-
-                const daysEl = document.getElementById('timer-days');
-                const hoursEl = document.getElementById('timer-hours');
-                const minsEl = document.getElementById('timer-minutes');
-                const secsEl = document.getElementById('timer-seconds');
-
-                if (daysEl) daysEl.innerText = d < 10 ? '0' + d : d;
-                if (hoursEl) hoursEl.innerText = h < 10 ? '0' + h : h;
-                if (minsEl) minsEl.innerText = m < 10 ? '0' + m : m;
-                if (secsEl) secsEl.innerText = s < 10 ? '0' + s : s;
-            }, 1000);
-        }
-
-        // --- 7. MODALS & RESOURCE ACTIONS ---
-        function openModal(type, preselectCourse = null) {
-            if (type === 'consultation') {
-                if (preselectCourse) {
-                    const select = document.getElementById('consult-course');
-                    if (select) select.value = preselectCourse;
-                }
-                document.getElementById('modal-consultation').classList.remove('hidden');
-            }
-        }
-
-        function closeModal(type) {
-            if (type === 'consultation') {
-                document.getElementById('modal-consultation').classList.add('hidden');
-            } else if (type === 'details') {
-                document.getElementById('modal-details').classList.add('hidden');
-            }
-        }
-
-        function openCourseDetails(courseId) {
-            const c = COURSES.find(item => item.id === courseId);
-            if (!c) return;
-
-            const container = document.getElementById('course-details-content');
-            container.innerHTML = `
-                <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
-                    ${c.badge}
-                </span>
-                <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-3">${c.title}</h2>
-                <p class="text-xs text-slate-500 mt-1">Минимальный уровень: ${c.level}</p>
-
-                <p class="text-sm text-slate-600 dark:text-slate-300 mt-4 leading-relaxed">${c.description}</p>
-
-                <div class="mt-6">
-                    <h4 class="font-bold text-sm text-slate-900 dark:text-white mb-3">Программа курса включает:</h4>
-                    <ul class="space-y-2">
-                        ${c.modules.map(m => `
-                            <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-600 shrink-0 mt-0.5"></i>
-                                <span>${m}</span>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div>
-                        <span class="text-xs text-slate-400 block">Стоимость:</span>
-                        <span class="text-2xl font-black text-brand-600 dark:text-brand-400">${c.price}</span>
-                    </div>
-                    <button onclick="closeModal('details'); openModal('consultation', '${c.title}');" class="px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-lg shadow-brand-500/20 transition">
-                        Записаться на курс
-                    </button>
-                </div>
-            `;
-            initLucide();
-            document.getElementById('modal-details').classList.remove('hidden');
-        }
-
-        function handleConsultationSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('consult-name').value;
-            closeModal('consultation');
-            showToast(`Спасибо, ${name}! Заявка принята. Менеджер свяжется с вами.`);
-            e.target.reset();
-        }
-
-        function downloadResource(resourceName) {
-            showToast(`Скачивание "${resourceName}" началось...`);
-        }
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = "pointer-events-auto p-4 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xl text-xs font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300";
-            toast.innerHTML = `
-                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 dark:text-emerald-600 shrink-0"></i>
-                <span>${msg}</span>
-            `;
-            container.appendChild(toast);
-            initLucide();
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'transition-opacity');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-    </script>
-
-<div id="modal-auth" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
- <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-sm relative border border-slate-200 dark:border-slate-800">
-  <button onclick="closeAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl leading-none" aria-label="Жабу">&times;</button>
-  <h2 id="auth-title" class="text-xl font-extrabold">Кіру</h2>
-  <p id="auth-mode-note" class="text-[11px] text-slate-500 mt-1"></p>
-  <form onsubmit="authSubmit(event)" class="space-y-3 mt-4">
-   <input id="auth-name" placeholder="Аты-жөні" class="hidden w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
-   <input id="auth-phone" type="tel" placeholder="+7 (7xx) 000-00-00" class="hidden w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
-   <input id="auth-email" type="email" required placeholder="Email" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
-   <input id="auth-pass" type="password" required minlength="6" placeholder="Құпиясөз (6+ таңба)" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
-   <button id="auth-submit" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm">Кіру</button>
-  </form>
-  <button id="auth-switch" onclick="toggleAuthMode()" class="mt-3 text-xs text-brand-600 dark:text-brand-400 font-semibold">Аккаунт жоқ па? Тіркелу</button>
- </div>
-</div>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aqtobe Study Hub — Courses, prices & addresses</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={darkMode:'class'}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased">
+<header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+ <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+  <a href="#" class="font-extrabold text-lg">Aqtobe<span class="text-indigo-600">Hub</span></a>
+  <nav class="hidden sm:flex gap-5 text-sm font-medium"><a href="#courses">Courses</a><a href="#centers">Addresses</a><a href="#files">Exam files</a></nav>
+  <div class="flex items-center gap-2">
+   <button onclick="document.documentElement.classList.toggle('dark')" class="px-3 py-2 rounded-full text-xs border border-slate-300 dark:border-slate-700">Dark / Light</button>
+   <button id="auth-btn" onclick="openAuth()" class="px-4 py-2 rounded-full text-sm font-semibold bg-indigo-600 text-white">Sign in</button>
+  </div></div></header>
+
+<section class="max-w-6xl mx-auto px-4 pt-10 pb-4">
+ <h1 class="text-3xl sm:text-4xl font-extrabold">Find a course in Aktobe</h1>
+ <p class="mt-2 text-slate-600 dark:text-slate-400 text-sm max-w-2xl">Real centers, real addresses and published prices (monthly, in tenge ₸). Tap <b>Call</b>, <b>WhatsApp</b>, <b>Map</b> or <b>Apply</b> on any card. Data checked 22 Oct 2026 — always confirm the price with the center.</p>
+ <div class="mt-5 flex flex-wrap gap-2 items-center" id="chips"></div>
+ <div class="mt-3 flex flex-col sm:flex-row gap-2">
+  <input id="q" oninput="render()" placeholder="Search: IELTS, ENT, NIS, kids, Altyn Orda…" class="flex-1 px-4 py-3 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+  <select id="sort" onchange="render()" class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"><option value="rec">Sort: recommended</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select>
+ </div>
+</section>
+
+<section id="courses" class="max-w-6xl mx-auto px-4 py-6">
+ <div id="count" class="text-xs text-slate-500 mb-3"></div>
+ <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+ <div class="mt-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-xs">
+  <b>Market reference (Kazinform):</b> ENT prep in Aktobe starts at about 65,000 ₸/month for a full multi-subject course; some offers reach 150,000 ₸. Private lessons start around 2,000 ₸/hour.</div>
+</section>
+
+<section id="centers" class="max-w-6xl mx-auto px-4 py-8">
+ <h2 class="text-2xl font-extrabold">Addresses</h2>
+ <p class="text-sm text-slate-600 dark:text-slate-400">Every point on one list. Buttons open Google Maps / 2GIS or start a call.</p>
+ <div id="addr" class="mt-4 grid md:grid-cols-2 gap-4"></div>
+</section>
+
+<section id="files" class="max-w-6xl mx-auto px-4 py-8">
+ <h2 class="text-2xl font-extrabold">Exam files &amp; official links</h2>
+ <p class="text-sm text-slate-600 dark:text-slate-400">Free checklists (download) and official sources. <b>Sign in</b> to unlock.</p>
+ <div id="files-grid" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</section>
+
+<footer class="border-t border-slate-200 dark:border-slate-800 py-8 text-center text-xs text-slate-500">© 2026 Aqtobe Study Hub · Sources: center websites, 2GIS, Kazinform, nis.edu.kz, ielts.kz</footer>
+
+<div id="toast" class="fixed bottom-5 right-5 z-[60] hidden max-w-xs p-4 rounded-2xl bg-slate-900 text-white text-xs font-semibold shadow-2xl"></div>
+
+<div id="m-detail" onclick="if(event.target===this)closeM('m-detail')" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70">
+ <div class="relative bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+  <button onclick="closeM('m-detail')" class="absolute top-3 right-4 text-2xl text-slate-400" aria-label="Close">&times;</button>
+  <div id="d-body"></div></div></div>
+<div id="m-apply" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70">
+ <form onsubmit="applySubmit(event)" class="relative bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-sm space-y-3">
+  <button type="button" onclick="closeM('m-apply')" class="absolute top-3 right-4 text-2xl text-slate-400">&times;</button>
+  <h3 class="text-xl font-extrabold">Apply / book a trial</h3>
+  <p id="ap-for" class="text-xs text-slate-500"></p>
+  <input id="ap-name" required placeholder="Your name" class="inp"><input id="ap-phone" required type="tel" placeholder="+7 7xx 000 00 00" class="inp">
+  <button class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm">Send request</button>
+  <p class="text-[11px] text-slate-500">Your request is saved to your account. To get an answer faster, press Call or WhatsApp on the card.</p>
+ </form></div>
+
+<div id="m-auth" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70">
+ <form onsubmit="authSubmit(event)" class="relative bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-sm space-y-3">
+  <button type="button" onclick="closeM('m-auth')" class="absolute top-3 right-4 text-2xl text-slate-400">&times;</button>
+  <h3 id="au-title" class="text-xl font-extrabold">Sign in</h3>
+  <p id="au-note" class="text-[11px] text-amber-600"></p>
+  <input id="au-name" placeholder="Full name" class="inp hidden"><input id="au-email" type="email" required placeholder="Email" class="inp">
+  <input id="au-pass" type="password" required minlength="6" placeholder="Password (6+ characters)" class="inp">
+  <button id="au-go" class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm">Sign in</button>
+  <button type="button" id="au-sw" onclick="swAuth()" class="text-xs font-semibold text-indigo-600">No account? Create one</button>
+ </form></div>
+
+<style>.inp{width:100%;padding:.75rem 1rem;font-size:.875rem;border-radius:.75rem;background:#f1f5f9;outline:none}.dark .inp{background:#1e293b}.btn{padding:.5rem .75rem;border-radius:.75rem;font-size:.75rem;font-weight:700;text-align:center;border:1px solid #cbd5e1}.dark .btn{border-color:#334155}.chip{padding:.5rem 1rem;border-radius:9999px;font-size:.75rem;font-weight:600;background:#e2e8f0;color:#334155}.dark .chip{background:#1e293b;color:#cbd5e1}.chip.on{background:#4f46e5;color:#fff}</style>
+
 <script>
-// ===== SUPABASE: мұнда өз кілттеріңді қой. Бос болса — демо режим (localStorage) =====
-const SUPABASE_URL = '';      // https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = ''; // anon public key
-const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let currentUser = null, authMode = 'login';
-const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
+// ===== SUPABASE (optional). Leave empty = demo mode saved in this browser =====
+const SUPABASE_URL='', SUPABASE_ANON_KEY='';
+const sb=(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 
-// ===== НАҚТЫ ДЕРЕКТЕР: 2GIS (Ақтөбе), Qanysh academy =====
-const BRANCHES = [
- {name:'Qanysh academy (орталық)', addr:'ул. Маресьева, 95, офис 21-22, 4 этаж', note:'2GIS: 4.8 (244 баға), 4 филиал', hours:'Ашылу уақытын 2GIS-те тексеріңіз', url:'https://2gis.kz/aktobe/firm/70000001054776297'},
- {name:'Qanysh academy (Абылқайыр хан)', addr:'пр. Абилкайыр хана, 68а, 1-2 этаж', note:'2GIS: 4.9 (230 баға). Ағылшын, қазақ тілі, НИШ/БИЛ/КТЛ, ЕНТ', hours:'Ашылу уақытын 2GIS-те тексеріңіз', url:'https://2gis.kz/aktobe/firm/70000001059618576'},
- {name:'Dostyq — білім беру орталығы', addr:'ул. Маресьева, 95/1, 4 этаж', note:'2GIS: 4.8 (137 баға)', hours:'Бүгін 09:00–18:00 (2GIS)', url:'https://2gis.kz/aktobe/firm/70000001032055330'},
- {name:'Жоғары Балл', addr:'ул. Пацаева, 42', note:'2GIS: 5.0 (66 баға), Qanysh academy-мен байланысты тізім', hours:'Телефон мен кестені 2GIS-те қараңыз', url:'https://2gis.kz/aktobe/firm/70000001040130431'}
-];
-const PRICE_NOTE = 'Qanysh academy ресми бағасы ашық жарияланбаған — академиядан нақтылаңыз. Нарықтық ориентир (Kazinform): Ақтөбеде ЕНТ-ке кешенді дайындық айына ≈65 000 ₸-ден, жеке сабақ ≈2 000 ₸/сағ-тан.';
-COURSES.length = 0;
-COURSES.push(
- {id:'ent', title:'ЕНТ / ҰБТ дайындық', category:'national', badge:'2GIS: ЕНТ', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'9-11 сынып', description:'Қанатқақты бағыт: профильді пәндер, математикалық сауаттылық, оқу сауаттылығы, Қазақстан тарихы. Сынақ тесттері.', modules:['Математикалық сауаттылық','Оқу сауаттылығы','Қазақстан тарихы','2 профильді пән (әрқайсысы 50 балл)','Сынақ ЕНТ тесттері']},
- {id:'nis', title:'НИШ / БИЛ / КТЛ дайындық', category:'national', badge:'2GIS: НИШ/БИЛ/КТЛ', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'5-6 сынып', description:'Мектептерге түсу емтихандарына дайындық: логика, математика, тілдер.', modules:['Логика және кеңістіктік ойлау','Математика','Қазақ, орыс, ағылшын тілі тесттері','Конкурстық сынақ']},
- {id:'english', title:'Ағылшын тілі', category:'international', badge:'2GIS: ағылшын', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Деңгейді анықтау тесті', description:'Ағылшын тілі курстары (академияның 2GIS карточкасында көрсетілген бағыт).', modules:['Деңгейді анықтау','Сөйлеу тәжірибесі','Грамматика және лексика']},
- {id:'kazakh', title:'Қазақ тілі', category:'it_skills', badge:'2GIS: қазақ тілі', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Барлық деңгей', description:'Қазақ тілі курстары (академияның 2GIS карточкасында көрсетілген бағыт).', modules:['Сөйлеу тәжірибесі','Грамматика','ЕНТ-ке арналған қазақ тілі']},
- {id:'online', title:'Онлайн сабақтар', category:'it_skills', badge:'Онлайн', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Барлығы', description:'Онлайн қызметтер, QR арқылы төлем (2GIS карточкасы бойынша).', modules:['Онлайн форматта ЕНТ/НИШ','QR төлем']}
-);
-// ескі бетте көрсетілмей қалмау үшін филиалдар/курстар тізімін толтыру
-function fillLists(){
- const b=document.getElementById('branches-grid');
- if(b) b.innerHTML=BRANCHES.map(x=>`<div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-  <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-300 flex items-center justify-center"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
-  <h3 class="font-bold text-lg">${esc(x.name)}</h3><p class="text-xs text-slate-500">${esc(x.addr)}</p>
-  <div class="text-xs space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400"><div>${esc(x.note)}</div><div>${esc(x.hours)}</div></div>
-  <a href="${x.url}" target="_blank" rel="noopener" class="inline-block text-xs font-semibold text-brand-600 dark:text-brand-400">2GIS-те ашу →</a></div>`).join('');
- const c=document.getElementById('consult-course'); if(c) c.innerHTML=COURSES.map(x=>`<option value="${esc(x.title)}">${esc(x.title)}</option>`).join('');
- const r=document.getElementById('consult-branch'); if(r) r.innerHTML=BRANCHES.map(x=>`<option value="${esc(x.name)}">${esc(x.addr)}</option>`).join('')+'<option value="Онлайн">Онлайн</option>';
- const sec=document.querySelector('#courses p'); if(sec) sec.insertAdjacentHTML('afterend',`<p class="text-[11px] text-amber-600 dark:text-amber-400 mt-2 max-w-2xl">${PRICE_NOTE}</p>`);
- initLucide();
-}
-
-// ===== ЕМТИХАН МАТЕРИАЛДАРЫ (тек аккаунтпен) =====
-const NIS_URL='https://www.nis.edu.kz/ru/page/oqytu-onlain-kursy';
-const MATERIALS = [
- {tag:'ЕНТ / ҰБТ', title:'ЕНТ дайындық жоспары (файл)', desc:'Құрылым: 140 балл — мат. сауаттылық 10, оқу сауаттылығы 10, Қаз. тарихы 20, 2 профильді пән 50+50. Тексеру парағы.', gen:'ent'},
- {tag:'НИШ / БИЛ / КТЛ', title:'НИШ-ке дайындық тізімі (файл)', desc:'Конкурсқа дайындық тексеру парағы.', gen:'nis'},
- {tag:'НИШ', title:'НИШ ресми онлайн-курсы', desc:'nis.edu.kz: түсуге дайындық онлайн-курсы (академия сайтында, ақылы — 15 000 ₸).', link:NIS_URL},
- {tag:'IELTS', title:'IELTS тіркеу орталықтары (Ақтөбе)', desc:'Ресми тіркеу орталықтарының тізімі.', link:'https://ielts.kz/registracija/spisok-registracionnyh-centrov-ielts__trashed/'}
-];
-const GEN = {
- ent:'ЕНТ ДАЙЫНДЫҚ ЖОСПАРЫ\n\nҚұрылым (максимум 140 балл):\n- Математикалық сауаттылық: 10\n- Оқу сауаттылығы: 10\n- Қазақстан тарихы: 20\n- 1-профильді пән: 50\n- 2-профильді пән: 50\n\nТексеру парағы:\n[ ] Профильді пәндерді таңдадым\n[ ] Апта сайын 1 сынақ тест\n[ ] Қате жұмысы дәптері\n[ ] Уақытты есептеу жаттығуы\n',
- nis:'НИШ / БИЛ / КТЛ ДАЙЫНДЫҚ ТІЗІМІ\n\n[ ] Логикалық есептер\n[ ] Математика (5-6 сынып деңгейінен жоғары)\n[ ] Қазақ / орыс / ағылшын тілдері\n[ ] Құжаттар мерзімін ресми сайттан тексеру\n'
+// ===== DATA (researched 22 Oct 2026) =====
+const C={
+ step:{n:'Step to English',a:'Altyn Orda microdistrict, 41v, bldg 2',h:'Mon–Sat 08:30–21:00',p:'+7 777 262 70 10',wa:'77758849681',u:'https://steptoenglish.kz/kursy-angliyskogo/aktobe',note:'Free first lesson. Oxford textbooks, British Council / IELTS partner.'},
+ aiplus:{n:'Aiplus',a:'Satpayev St, 10a',h:'',p:'',wa:'',u:'https://onlineaiplus.kz/ent',note:'ENT, NIS, RFMS, KTL prep. 2GIS rating 5.0 (140 reviews).'},
+ q1:{n:'Qanysh academy — Maresyev',a:'Maresyev St, 95, office 21-22, 4th floor',h:'Opens 10:00 (2GIS)',p:'',wa:'',u:'https://2gis.kz/aktobe/firm/70000001054776297',note:'2GIS rating 4.8 (244 reviews). 4 branches in total.'},
+ q2:{n:'Qanysh academy — Abylkair Khan',a:'Abylkair Khan Ave, 68a, floors 1–2',h:'',p:'',wa:'',u:'https://2gis.kz/aktobe/firm/70000001059618576',note:'2GIS rating 4.9. English, Kazakh, NIS/BIL/KTL, ENT, online, QR payment.'},
+ q3:{n:'Qanysh academy — Tauelsizdik',a:'Tauelsizdik Ave, 14/1',h:'',p:'',wa:'',u:'https://2gis.kz/aktobe/search/%D0%9F%D0%BE%D0%B4%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BD%D0%B8%D1%88',note:'Listed on 2GIS as a Qanysh academy branch.'},
+ dq1:{n:'Dostyq education center',a:'Maresyev St, 95/1, 4th floor',h:'Daily 09:00–18:00 (2GIS)',p:'',wa:'',u:'https://2gis.kz/aktobe/firm/70000001032055330',note:'2GIS rating 4.8 (137 reviews).'},
+ dq2:{n:'Dostyq education center — Shokay',a:'Mustafa Shokay St, 11',h:'',p:'',wa:'',u:'https://2gis.kz/aktobe/search/%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D1%8B%D0%B9%20%D1%86%D0%B5%D0%BD%D1%82%D1%80%20%D0%B5%D0%BD%D1%82',note:'ENT / NIS prep (2GIS).'},
+ ron:{n:'Ronalyn English Academy — IELTS Centre',a:'11th microdistrict, Az-Nauryz St, 5',h:'',p:'+7 701 084 77 97',wa:'77010847797',u:'https://ielts.kz/registracija/spisok-registracionnyh-centrov-ielts__trashed/',note:'Official IELTS registration center in Aktobe.'},
+ hog:{n:'Hogwarts education center',a:'Altyn Orda microdistrict, 6a',h:'',p:'+7 771 181 72 22',wa:'77711817222',u:'https://ielts.kz/registracija/spisok-registracionnyh-centrov-ielts__trashed/',note:'Official IELTS registration center in Aktobe.'}
 };
-function renderMaterials(){
- const g=document.getElementById('materials-grid'); if(!g) return;
- g.innerHTML=MATERIALS.map((m,i)=>`<div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
-  <div><span class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">${esc(m.tag)}</span><h3 class="text-lg font-bold mt-1">${esc(m.title)}</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2">${esc(m.desc)}</p></div>
-  <button onclick="openMaterial(${i})" class="mt-6 w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition">${m.gen?'Жүктеу (.txt)':'Ашу'} ${currentUser?'':'🔒'}</button></div>`).join('');
-}
-function openMaterial(i){
- if(!currentUser){ showToast('Алдымен аккаунтқа кіріңіз'); openAuth(); return; }
- const m=MATERIALS[i];
- if(m.gen){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([GEN[m.gen]],{type:'text/plain;charset=utf-8'})); a.download=m.gen+'-plan.txt'; a.click(); URL.revokeObjectURL(a.href); }
- else window.open(m.link,'_blank','noopener');
-}
-function downloadResource(){ document.getElementById('materials').scrollIntoView(); }
+// price = from, ₸/month (0 = not published)
+const COURSES=[
+ {t:'English for adults (18+)',cat:'english',c:'step',price:22000,pt:'from 22,000 ₸/month'},
+ {t:'IELTS / TOEFL preparation',cat:'english',c:'step',price:35000,pt:'from 35,000 ₸/month'},
+ {t:'English online',cat:'online',c:'step',price:45900,pt:'from 45,900 ₸/month'},
+ {t:'English for kids 8–10',cat:'english',c:'step',price:49900,pt:'from 49,900 ₸/month'},
+ {t:'English for teens 11–17',cat:'english',c:'step',price:49900,pt:'from 49,900 ₸/month'},
+ {t:'English for little ones 5–7',cat:'english',c:'step',price:49900,pt:'from 49,900 ₸/month'},
+ {t:'Coding & robotics 8–16',cat:'kids',c:'step',price:28000,pt:'from 28,000 ₸/month'},
+ {t:'ENT online — 2 profile subjects',cat:'ent',c:'aiplus',price:37500,pt:'37,500 ₸/month (online course)'},
+ {t:'ENT online — 2 profile + 2 core subjects',cat:'ent',c:'aiplus',price:50000,pt:'50,000 ₸/month (online course)'},
+ {t:'NIS / RFMS / KTL entrance prep',cat:'nis',c:'aiplus',price:0,pt:'Price on request'},
+ {t:'ENT, NIS / BIL / KTL, English, Kazakh',cat:'ent',c:'q2',price:0,pt:'Price on request',alt:['q1','q3']},
+ {t:'ENT / NIS preparation',cat:'ent',c:'dq1',price:0,pt:'Price on request',alt:['dq2']},
+ {t:'IELTS preparation & exam registration',cat:'english',c:'ron',price:0,pt:'Price on request',alt:['hog']}
+];
+const CHIPS=[['all','All'],['english','English & IELTS'],['ent','ENT'],['nis','NIS / BIL / KTL'],['online','Online'],['kids','Kids']];
+const FILES=[
+ {tag:'ENT',t:'ENT preparation checklist',d:'140-point structure (10+10+20+50+50) and a weekly plan.',gen:'ent'},
+ {tag:'NIS',t:'NIS / BIL / KTL checklist',d:'Entrance exam preparation checklist.',gen:'nis'},
+ {tag:'IELTS',t:'IELTS 8-week plan',d:'Weekly skills plan for Listening, Reading, Writing, Speaking.',gen:'ielts'},
+ {tag:'Official',t:'NIS online preparation course',d:'nis.edu.kz — paid online course for entrance (15,000 ₸).',link:'https://www.nis.edu.kz/ru/page/oqytu-onlain-kursy'},
+ {tag:'Official',t:'IELTS registration centers',d:'ielts.kz — list of official centers in Kazakhstan, incl. Aktobe.',link:'https://ielts.kz/registracija/spisok-registracionnyh-centrov-ielts__trashed/'},
+ {tag:'Official',t:'National Testing Center (ENT)',d:'testcenter.kz — official ENT information and registration.',link:'https://testcenter.kz'}
+];
+const GEN={
+ ent:'ENT PREPARATION CHECKLIST\n\nStructure (max 140 points):\n- Mathematical literacy: 10\n- Reading literacy: 10\n- History of Kazakhstan: 20\n- Profile subject 1: 50\n- Profile subject 2: 50\n\nWeekly plan:\n[ ] 1 full mock test\n[ ] Error notebook review\n[ ] Timed practice 3x\n[ ] Confirm dates on testcenter.kz\n',
+ nis:'NIS / BIL / KTL CHECKLIST\n\n[ ] Logic and spatial reasoning tasks\n[ ] Advanced math (grades 5-6)\n[ ] Kazakh / Russian / English tests\n[ ] Check dates and documents on nis.edu.kz\n',
+ ielts:'IELTS 8-WEEK PLAN\n\nWeeks 1-2: diagnostic test, vocabulary, listening basics\nWeeks 3-4: reading strategies, Task 1 writing\nWeeks 5-6: Task 2 essays, speaking parts 1-3\nWeeks 7-8: full mocks, review weak areas\nRegister at an official center (see ielts.kz).\n'};
 
-// ===== АККАУНТ =====
-function openAuth(){
- if(currentUser){ if(confirm(currentUser.email+'\nШығу керек пе?')) logout(); return; }
- document.getElementById('auth-mode-note').textContent = sb ? '' : 'Демо режим: Supabase кілттері бос, деректер осы браузерде сақталады.';
- document.getElementById('modal-auth').classList.remove('hidden');
+// ===== UI =====
+let cat='all',user=null,mode='login',applyFor='';
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const map=a=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a+', Aktobe, Kazakhstan');
+function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500)}
+function openM(id){$(id).classList.remove('hidden')} function closeM(id){$(id).classList.add('hidden')}
+function btns(c,title,i){const x=C[c];return `<div class="grid grid-cols-2 gap-2 mt-3">
+ <button class="btn col-span-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900" onclick="openDetail(${i})">Open details window</button>
+ ${x.p?`<a class="btn" href="tel:${x.p.replace(/[^+\d]/g,'')}">📞 Call</a>`:`<a class="btn" href="${x.u}" target="_blank" rel="noopener">🔗 Info / phone</a>`}
+ ${x.wa?`<a class="btn" href="https://wa.me/${x.wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`:`<a class="btn" href="${x.u}" target="_blank" rel="noopener">⭐ 2GIS page</a>`}
+ <a class="btn" href="${map(x.a)}" target="_blank" rel="noopener">📍 Map</a>
+ <button class="btn bg-indigo-600 text-white border-indigo-600" onclick="openApply('${E(title).replace(/'/g,'')} — ${E(x.n)}')">Apply</button></div>`}
+function render(){
+ $('chips').innerHTML=CHIPS.map(([k,l])=>`<button class="chip ${cat===k?'on':''}" onclick="cat='${k}';render()">${l}</button>`).join('');
+ const q=$('q').value.toLowerCase(),s=$('sort').value;
+ let L=COURSES.filter(c=>(cat==='all'||c.cat===cat)&&(c.t+' '+C[c.c].n+' '+C[c.c].a).toLowerCase().includes(q));
+ if(s!=='rec'){const priced=L.filter(c=>c.price),rest=L.filter(c=>!c.price);priced.sort((a,b)=>s==='asc'?a.price-b.price:b.price-a.price);L=[...priced,...rest]}
+ $('count').textContent=L.length+' offers';
+ $('grid').innerHTML=L.map(c=>{const x=C[c.c];return `<div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+  <div><div class="text-[11px] font-bold uppercase text-indigo-600">${E(x.n)}</div><h3 class="text-lg font-bold mt-1 cursor-pointer hover:text-indigo-600" onclick="openDetail(${COURSES.indexOf(c)})">${E(c.t)}</h3>
+  <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-2">${E(c.pt)}</div>
+  <p class="text-xs mt-2">📍 ${E(x.a)}${(c.alt||[]).map(k=>`<br>📍 ${E(C[k].a)}`).join('')}</p>
+  ${x.h?`<p class="text-xs text-slate-500 mt-1">🕒 ${E(x.h)}</p>`:''}${x.p?`<p class="text-xs text-slate-500">📞 ${E(x.p)}</p>`:''}
+  <p class="text-[11px] text-slate-500 mt-2">${E(x.note)}</p></div>${btns(c.c,c.t,COURSES.indexOf(c))}</div>`}).join('')||'<p class="text-sm">No results. Try another search.</p>';
 }
-function closeAuth(){ document.getElementById('modal-auth').classList.add('hidden'); }
-function toggleAuthMode(){
- authMode = authMode==='login' ? 'register' : 'login'; const reg = authMode==='register';
- document.getElementById('auth-title').textContent = reg?'Тіркелу':'Кіру';
- document.getElementById('auth-submit').textContent = reg?'Тіркелу':'Кіру';
- document.getElementById('auth-switch').textContent = reg?'Аккаунт бар ма? Кіру':'Аккаунт жоқ па? Тіркелу';
- ['auth-name','auth-phone'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!reg));
-}
-function setUser(u){
- currentUser=u; document.getElementById('auth-label').textContent = u ? (u.name||u.email.split('@')[0]) : 'Кіру'; renderMaterials();
-}
-async function authSubmit(e){
- e.preventDefault();
- const email=document.getElementById('auth-email').value.trim(), pass=document.getElementById('auth-pass').value;
- const name=document.getElementById('auth-name').value.trim(), phone=document.getElementById('auth-phone').value.trim();
- try{
-  if(sb){
-   const r = authMode==='register' ? await sb.auth.signUp({email,password:pass,options:{data:{full_name:name,phone}}}) : await sb.auth.signInWithPassword({email,password:pass});
-   if(r.error) throw r.error;
-   if(!r.data.session){ showToast('Поштаңызды растаңыз, сосын кіріңіз'); closeAuth(); return; }
-   setUser({email, name: r.data.user.user_metadata?.full_name});
-  } else {
-   const users=jget('demo_users',{});
-   if(authMode==='register'){ if(users[email]) throw new Error('Бұл email тіркелген'); users[email]={pass:btoa(unescape(encodeURIComponent(pass))),name,phone}; localStorage.setItem('demo_users',JSON.stringify(users)); }
-   else if(!users[email] || users[email].pass!==btoa(unescape(encodeURIComponent(pass)))) throw new Error('Email немесе құпиясөз қате');
-   localStorage.setItem('demo_session',email); setUser({email,name:users[email].name});
-  }
-  closeAuth(); showToast('Сәтті кірдіңіз');
- }catch(err){ showToast(err.message||'Қате'); }
-}
-async function logout(){ if(sb) await sb.auth.signOut(); localStorage.removeItem('demo_session'); setUser(null); showToast('Шықтыңыз'); }
-async function initAuth(){
- if(sb){ const {data}=await sb.auth.getSession(); if(data.session) setUser({email:data.session.user.email,name:data.session.user.user_metadata?.full_name}); }
- else { const em=localStorage.getItem('demo_session'), u=jget('demo_users',{})[em]; if(u) setUser({email:em,name:u.name}); }
-}
+function renderAddr(){ $('addr').innerHTML=Object.entries(C).map(([k,x])=>`<div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+ <div class="font-bold">${E(x.n)}</div><div class="text-sm">📍 ${E(x.a)}, Aktobe</div>${x.h?`<div class="text-xs text-slate-500">🕒 ${E(x.h)}</div>`:''}${x.p?`<div class="text-xs text-slate-500">📞 ${E(x.p)}</div>`:''}
+ <div class="flex gap-2 mt-2 text-xs font-semibold"><a class="text-indigo-600" target="_blank" rel="noopener" href="${map(x.a)}">Open map</a><a class="text-indigo-600" target="_blank" rel="noopener" href="${x.u}">Source</a><button class="text-indigo-600" onclick="openCenter('${k}')">Details window</button></div></div>`).join('')}
+function renderFiles(){ $('files-grid').innerHTML=FILES.map((f,i)=>`<div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+ <div><span class="text-[11px] font-bold uppercase text-emerald-600">${f.tag}</span><h3 class="font-bold mt-1">${E(f.t)}</h3><p class="text-xs text-slate-500 mt-1">${E(f.d)}</p></div>
+ <button class="btn mt-4" onclick="getFile(${i})">${f.gen?'⬇ Download (.txt)':'Open'} ${user?'':'🔒'}</button></div>`).join('')}
+function getFile(i){ if(!user){toast('Please sign in first');openAuth();return}
+ const f=FILES[i]; if(f.gen){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([GEN[f.gen]],{type:'text/plain'}));a.download=f.gen+'-checklist.txt';a.click()} else window.open(f.link,'_blank','noopener') }
 
-// ===== ЗАЯВКА: аккаунтпен сақталады =====
-async function handleConsultationSubmit(e){
- e.preventDefault();
- const row={name:document.getElementById('consult-name').value, phone:document.getElementById('consult-phone').value, course:document.getElementById('consult-course').value, branch:document.getElementById('consult-branch').value};
- try{
-  if(sb){ const {data:{user}}=await sb.auth.getUser(); const {error}=await sb.from('applications').insert({...row,user_id:user?user.id:null}); if(error) throw error; }
-  else { const a=jget('demo_applications',[]); a.push({...row,email:currentUser?currentUser.email:null,at:new Date().toISOString()}); localStorage.setItem('demo_applications',JSON.stringify(a)); }
-  closeModal('consultation'); showToast('Рақмет, '+row.name+'! Өтінім қабылданды.'); e.target.reset();
- }catch(err){ showToast('Қате: '+(err.message||err)); }
-}
-document.addEventListener('DOMContentLoaded',()=>{ fillLists(); renderCourses(COURSES); renderMaterials(); initAuth(); });
-</script>
-</body>
-</html>
+// ===== DETAIL WINDOWS (one per course / center) =====
+function acts(k,i){const x=C[k];return `<div class="grid grid-cols-2 gap-2 pt-2">
+ ${x.p?`<a class="btn" href="tel:${x.p.replace(/[^+\d]/g,'')}">📞 Call</a>`:`<a class="btn" href="${x.u}" target="_blank" rel="noopener">🔗 Info / phone</a>`}
+ ${x.wa?`<a class="btn" href="https://wa.me/${x.wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`:`<a class="btn" href="${x.u}" target="_blank" rel="noopener">⭐ 2GIS page</a>`}
+ <a class="btn" href="${map(x.a)}" target="_blank" rel="noopener">📍 Open in Maps</a>
+ <button class="btn bg-indigo-600 text-white border-indigo-600" onclick="applyC(${i},'${k}')">Apply</button></div>`}
+function loc(k,i){const x=C[k];return `<div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 space-y-1">
+ <div class="font-bold text-sm">${E(x.n)}</div><div class="text-xs">📍 ${E(x.a)}, Aktobe</div>
+ ${x.h?`<div class="text-xs">🕒 ${E(x.h)}</div>`:''}${x.p?`<div class="text-xs">📞 ${E(x.p)}</div>`:''}
+ <div class="text-[11px] text-slate-500">${E(x.note)}</div>${acts(k,i)}</div>`}
+function frame(k){return `<iframe title="Map" loading="lazy" class="w-full h-52 rounded-2xl mt-3 border-0" src="https://www.google.com/maps?q=${encodeURIComponent(C[k].a+', Aktobe, Kazakhstan')}&output=embed"></iframe>`}
+function others(k,except){const L=COURSES.map((c,j)=>[c,j]).filter(([c,j])=>j!==except&&(c.c===k||(c.alt||[]).includes(k)));
+ return L.length?`<h4 class="font-bold text-sm mt-5 mb-2">Other offers here</h4><div class="space-y-2">${L.map(([c,j])=>`<button class="btn w-full text-left flex justify-between" onclick="openDetail(${j})"><span>${E(c.t)}</span><span>${E(c.pt)}</span></button>`).join('')}</div>`:''}
+function openDetail(i){const c=COURSES[i],ks=[c.c,...(c.alt||[])];
+ $('d-body').innerHTML=`<div class="text-[11px] font-bold uppercase text-indigo-600">${E(C[c.c].n)}</div><h3 class="text-2xl font-extrabold mt-1 pr-6">${E(c.t)}</h3>
+ <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-2">${E(c.pt)}</div><p class="text-[11px] text-slate-500">Prices checked 22 Oct 2026. Confirm with the center.</p>
+ ${frame(c.c)}<div class="space-y-3 mt-3">${ks.map(k=>loc(k,i)).join('')}</div>${others(c.c,i)}`;openM('m-detail')}
+function openCenter(k){
+ $('d-body').innerHTML=`<h3 class="text-2xl font-extrabold pr-6">${E(C[k].n)}</h3>${frame(k)}<div class="mt-3">${loc(k,-1)}</div>${others(k,-1)}`;openM('m-detail')}
+function applyC(i,k){closeM('m-detail');openApply((i>=0?COURSES[i].t+' — ':'')+C[k].n)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['m-detail','m-apply','m-auth'].forEach(closeM)});
+
+// ===== APPLY =====
+function openApply(t){applyFor=t;$('ap-for').textContent=t;openM('m-apply')}
+async function applySubmit(e){e.preventDefault();
+ const row={name:$('ap-name').value,phone:$('ap-phone').value,course:applyFor,branch:'Aktobe'};
+ try{ if(sb){const{data:{user:u}}=await sb.auth.getUser();const{error}=await sb.from('applications').insert({...row,user_id:u?u.id:null});if(error)throw error}
+  else{const a=JSON.parse(localStorage.getItem('apps')||'[]');a.push({...row,email:user?user.email:null,at:new Date().toISOString()});localStorage.setItem('apps',JSON.stringify(a))}
+  closeM('m-apply');e.target.reset();toast('Thank you! Request saved.')}catch(x){toast('Error: '+(x.message||x))}}
+
+// ===== ACCOUNT =====
+function setUser(u){user=u;$('auth-btn').textContent=u?(u.name||u.email.split('@')[0])+' · Sign out':'Sign in';renderFiles()}
+function openAuth(){ if(user){logout();return} $('au-note').textContent=sb?'':'Demo mode: no Supabase keys set, data stays in this browser.';openM('m-auth')}
+function swAuth(){mode=mode==='login'?'register':'login';const r=mode==='register';$('au-title').textContent=r?'Create account':'Sign in';$('au-go').textContent=r?'Create account':'Sign in';$('au-sw').textContent=r?'Have an account? Sign in':'No account? Create one';$('au-name').classList.toggle('hidden',!r)}
+const enc=p=>btoa(unescape(encodeURIComponent(p)));
+async function authSubmit(e){e.preventDefault();const em=$('au-email').value.trim(),pw=$('au-pass').value,nm=$('au-name').value.trim();
+ try{ if(sb){const r=mode==='register'?await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:nm}}}):await sb.auth.signInWithPassword({email:em,password:pw});
+   if(r.error)throw r.error; if(!r.data.session){toast('Check your email to confirm, then sign in');closeM('m-auth');return}
+   setUser({email:em,name:r.data.user.user_metadata?.full_name})}
+  else{const U=JSON.parse(localStorage.getItem('users')||'{}');
+   if(mode==='register'){if(U[em])throw new Error('Email already registered');U[em]={p:enc(pw),n:nm};localStorage.setItem('users',JSON.stringify(U))}
+   else if(!U[em]||U[em].p!==enc(pw))throw new Error('Wrong email or password');
+   localStorage.setItem('session',em);setUser({email:em,name:U[em].n})}
+  closeM('m-auth');toast('Signed in')}catch(x){toast(x.message||'Error')}}
+async function logout(){if(sb)await sb.auth.signOut();localStorage.removeItem('session');setUser(null);toast('Signed out')}
+(async()=>{render();renderAddr();renderFiles();
+ if(sb){const{data}=await sb.auth.getSession();if(data.session)setUser({email:data.session.user.email,name:data.session.user.user_metadata?.full_name})}
+ else{const em=localStorage.getItem('session'),u=JSON.parse(localStorage.getItem('users')||'{}')[em];if(u)setUser({email:em,name:u.n})}})();
+</script></body></html>
