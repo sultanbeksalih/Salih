@@ -123,6 +123,7 @@
                     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                 </button>
 
+                <button id="auth-btn" onclick="openAuth()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-lucide="user" class="w-4 h-4"></i><span id="auth-label">Кіру</span></button>
                 <!-- CTA Button -->
                 <button onclick="openModal('consultation')" class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold text-sm text-white bg-gradient-to-r from-brand-600 to-aqtobe-teal hover:opacity-95 shadow-lg shadow-brand-500/20 active:scale-95 transition">
                     Пробный урок
@@ -347,7 +348,7 @@
             </div>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="materials-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Material 1 -->
             <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
                 <div>
@@ -404,7 +405,7 @@
                 <p class="text-slate-600 dark:text-slate-400 text-sm mt-2">Современные аудитории, оборудованные коворкинги и удобные локации во всех ключевых районах города.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6">
+            <div id="branches-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Branch 1 -->
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                     <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-300 flex items-center justify-center">
@@ -1144,5 +1145,141 @@
             }, 3500);
         }
     </script>
+
+<div id="modal-auth" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+ <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-sm relative border border-slate-200 dark:border-slate-800">
+  <button onclick="closeAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl leading-none" aria-label="Жабу">&times;</button>
+  <h2 id="auth-title" class="text-xl font-extrabold">Кіру</h2>
+  <p id="auth-mode-note" class="text-[11px] text-slate-500 mt-1"></p>
+  <form onsubmit="authSubmit(event)" class="space-y-3 mt-4">
+   <input id="auth-name" placeholder="Аты-жөні" class="hidden w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
+   <input id="auth-phone" type="tel" placeholder="+7 (7xx) 000-00-00" class="hidden w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
+   <input id="auth-email" type="email" required placeholder="Email" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
+   <input id="auth-pass" type="password" required minlength="6" placeholder="Құпиясөз (6+ таңба)" class="w-full px-4 py-3 text-sm rounded-xl bg-slate-100 dark:bg-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
+   <button id="auth-submit" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm">Кіру</button>
+  </form>
+  <button id="auth-switch" onclick="toggleAuthMode()" class="mt-3 text-xs text-brand-600 dark:text-brand-400 font-semibold">Аккаунт жоқ па? Тіркелу</button>
+ </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+// ===== SUPABASE: мұнда өз кілттеріңді қой. Бос болса — демо режим (localStorage) =====
+const SUPABASE_URL = '';      // https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = ''; // anon public key
+const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let currentUser = null, authMode = 'login';
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
+
+// ===== НАҚТЫ ДЕРЕКТЕР: 2GIS (Ақтөбе), Qanysh academy =====
+const BRANCHES = [
+ {name:'Qanysh academy (орталық)', addr:'ул. Маресьева, 95, офис 21-22, 4 этаж', note:'2GIS: 4.8 (244 баға), 4 филиал', hours:'Ашылу уақытын 2GIS-те тексеріңіз', url:'https://2gis.kz/aktobe/firm/70000001054776297'},
+ {name:'Qanysh academy (Абылқайыр хан)', addr:'пр. Абилкайыр хана, 68а, 1-2 этаж', note:'2GIS: 4.9 (230 баға). Ағылшын, қазақ тілі, НИШ/БИЛ/КТЛ, ЕНТ', hours:'Ашылу уақытын 2GIS-те тексеріңіз', url:'https://2gis.kz/aktobe/firm/70000001059618576'},
+ {name:'Dostyq — білім беру орталығы', addr:'ул. Маресьева, 95/1, 4 этаж', note:'2GIS: 4.8 (137 баға)', hours:'Бүгін 09:00–18:00 (2GIS)', url:'https://2gis.kz/aktobe/firm/70000001032055330'},
+ {name:'Жоғары Балл', addr:'ул. Пацаева, 42', note:'2GIS: 5.0 (66 баға), Qanysh academy-мен байланысты тізім', hours:'Телефон мен кестені 2GIS-те қараңыз', url:'https://2gis.kz/aktobe/firm/70000001040130431'}
+];
+const PRICE_NOTE = 'Qanysh academy ресми бағасы ашық жарияланбаған — академиядан нақтылаңыз. Нарықтық ориентир (Kazinform): Ақтөбеде ЕНТ-ке кешенді дайындық айына ≈65 000 ₸-ден, жеке сабақ ≈2 000 ₸/сағ-тан.';
+COURSES.length = 0;
+COURSES.push(
+ {id:'ent', title:'ЕНТ / ҰБТ дайындық', category:'national', badge:'2GIS: ЕНТ', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'9-11 сынып', description:'Қанатқақты бағыт: профильді пәндер, математикалық сауаттылық, оқу сауаттылығы, Қазақстан тарихы. Сынақ тесттері.', modules:['Математикалық сауаттылық','Оқу сауаттылығы','Қазақстан тарихы','2 профильді пән (әрқайсысы 50 балл)','Сынақ ЕНТ тесттері']},
+ {id:'nis', title:'НИШ / БИЛ / КТЛ дайындық', category:'national', badge:'2GIS: НИШ/БИЛ/КТЛ', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'5-6 сынып', description:'Мектептерге түсу емтихандарына дайындық: логика, математика, тілдер.', modules:['Логика және кеңістіктік ойлау','Математика','Қазақ, орыс, ағылшын тілі тесттері','Конкурстық сынақ']},
+ {id:'english', title:'Ағылшын тілі', category:'international', badge:'2GIS: ағылшын', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Деңгейді анықтау тесті', description:'Ағылшын тілі курстары (академияның 2GIS карточкасында көрсетілген бағыт).', modules:['Деңгейді анықтау','Сөйлеу тәжірибесі','Грамматика және лексика']},
+ {id:'kazakh', title:'Қазақ тілі', category:'it_skills', badge:'2GIS: қазақ тілі', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Барлық деңгей', description:'Қазақ тілі курстары (академияның 2GIS карточкасында көрсетілген бағыт).', modules:['Сөйлеу тәжірибесі','Грамматика','ЕНТ-ке арналған қазақ тілі']},
+ {id:'online', title:'Онлайн сабақтар', category:'it_skills', badge:'Онлайн', rating:'4.9', reviewsCount:230, price:'Бағасы: нақтылаңыз', level:'Барлығы', description:'Онлайн қызметтер, QR арқылы төлем (2GIS карточкасы бойынша).', modules:['Онлайн форматта ЕНТ/НИШ','QR төлем']}
+);
+// ескі бетте көрсетілмей қалмау үшін филиалдар/курстар тізімін толтыру
+function fillLists(){
+ const b=document.getElementById('branches-grid');
+ if(b) b.innerHTML=BRANCHES.map(x=>`<div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+  <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-300 flex items-center justify-center"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+  <h3 class="font-bold text-lg">${esc(x.name)}</h3><p class="text-xs text-slate-500">${esc(x.addr)}</p>
+  <div class="text-xs space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400"><div>${esc(x.note)}</div><div>${esc(x.hours)}</div></div>
+  <a href="${x.url}" target="_blank" rel="noopener" class="inline-block text-xs font-semibold text-brand-600 dark:text-brand-400">2GIS-те ашу →</a></div>`).join('');
+ const c=document.getElementById('consult-course'); if(c) c.innerHTML=COURSES.map(x=>`<option value="${esc(x.title)}">${esc(x.title)}</option>`).join('');
+ const r=document.getElementById('consult-branch'); if(r) r.innerHTML=BRANCHES.map(x=>`<option value="${esc(x.name)}">${esc(x.addr)}</option>`).join('')+'<option value="Онлайн">Онлайн</option>';
+ const sec=document.querySelector('#courses p'); if(sec) sec.insertAdjacentHTML('afterend',`<p class="text-[11px] text-amber-600 dark:text-amber-400 mt-2 max-w-2xl">${PRICE_NOTE}</p>`);
+ initLucide();
+}
+
+// ===== ЕМТИХАН МАТЕРИАЛДАРЫ (тек аккаунтпен) =====
+const NIS_URL='https://www.nis.edu.kz/ru/page/oqytu-onlain-kursy';
+const MATERIALS = [
+ {tag:'ЕНТ / ҰБТ', title:'ЕНТ дайындық жоспары (файл)', desc:'Құрылым: 140 балл — мат. сауаттылық 10, оқу сауаттылығы 10, Қаз. тарихы 20, 2 профильді пән 50+50. Тексеру парағы.', gen:'ent'},
+ {tag:'НИШ / БИЛ / КТЛ', title:'НИШ-ке дайындық тізімі (файл)', desc:'Конкурсқа дайындық тексеру парағы.', gen:'nis'},
+ {tag:'НИШ', title:'НИШ ресми онлайн-курсы', desc:'nis.edu.kz: түсуге дайындық онлайн-курсы (академия сайтында, ақылы — 15 000 ₸).', link:NIS_URL},
+ {tag:'IELTS', title:'IELTS тіркеу орталықтары (Ақтөбе)', desc:'Ресми тіркеу орталықтарының тізімі.', link:'https://ielts.kz/registracija/spisok-registracionnyh-centrov-ielts__trashed/'}
+];
+const GEN = {
+ ent:'ЕНТ ДАЙЫНДЫҚ ЖОСПАРЫ\n\nҚұрылым (максимум 140 балл):\n- Математикалық сауаттылық: 10\n- Оқу сауаттылығы: 10\n- Қазақстан тарихы: 20\n- 1-профильді пән: 50\n- 2-профильді пән: 50\n\nТексеру парағы:\n[ ] Профильді пәндерді таңдадым\n[ ] Апта сайын 1 сынақ тест\n[ ] Қате жұмысы дәптері\n[ ] Уақытты есептеу жаттығуы\n',
+ nis:'НИШ / БИЛ / КТЛ ДАЙЫНДЫҚ ТІЗІМІ\n\n[ ] Логикалық есептер\n[ ] Математика (5-6 сынып деңгейінен жоғары)\n[ ] Қазақ / орыс / ағылшын тілдері\n[ ] Құжаттар мерзімін ресми сайттан тексеру\n'
+};
+function renderMaterials(){
+ const g=document.getElementById('materials-grid'); if(!g) return;
+ g.innerHTML=MATERIALS.map((m,i)=>`<div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover flex flex-col justify-between">
+  <div><span class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">${esc(m.tag)}</span><h3 class="text-lg font-bold mt-1">${esc(m.title)}</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2">${esc(m.desc)}</p></div>
+  <button onclick="openMaterial(${i})" class="mt-6 w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition">${m.gen?'Жүктеу (.txt)':'Ашу'} ${currentUser?'':'🔒'}</button></div>`).join('');
+}
+function openMaterial(i){
+ if(!currentUser){ showToast('Алдымен аккаунтқа кіріңіз'); openAuth(); return; }
+ const m=MATERIALS[i];
+ if(m.gen){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([GEN[m.gen]],{type:'text/plain;charset=utf-8'})); a.download=m.gen+'-plan.txt'; a.click(); URL.revokeObjectURL(a.href); }
+ else window.open(m.link,'_blank','noopener');
+}
+function downloadResource(){ document.getElementById('materials').scrollIntoView(); }
+
+// ===== АККАУНТ =====
+function openAuth(){
+ if(currentUser){ if(confirm(currentUser.email+'\nШығу керек пе?')) logout(); return; }
+ document.getElementById('auth-mode-note').textContent = sb ? '' : 'Демо режим: Supabase кілттері бос, деректер осы браузерде сақталады.';
+ document.getElementById('modal-auth').classList.remove('hidden');
+}
+function closeAuth(){ document.getElementById('modal-auth').classList.add('hidden'); }
+function toggleAuthMode(){
+ authMode = authMode==='login' ? 'register' : 'login'; const reg = authMode==='register';
+ document.getElementById('auth-title').textContent = reg?'Тіркелу':'Кіру';
+ document.getElementById('auth-submit').textContent = reg?'Тіркелу':'Кіру';
+ document.getElementById('auth-switch').textContent = reg?'Аккаунт бар ма? Кіру':'Аккаунт жоқ па? Тіркелу';
+ ['auth-name','auth-phone'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!reg));
+}
+function setUser(u){
+ currentUser=u; document.getElementById('auth-label').textContent = u ? (u.name||u.email.split('@')[0]) : 'Кіру'; renderMaterials();
+}
+async function authSubmit(e){
+ e.preventDefault();
+ const email=document.getElementById('auth-email').value.trim(), pass=document.getElementById('auth-pass').value;
+ const name=document.getElementById('auth-name').value.trim(), phone=document.getElementById('auth-phone').value.trim();
+ try{
+  if(sb){
+   const r = authMode==='register' ? await sb.auth.signUp({email,password:pass,options:{data:{full_name:name,phone}}}) : await sb.auth.signInWithPassword({email,password:pass});
+   if(r.error) throw r.error;
+   if(!r.data.session){ showToast('Поштаңызды растаңыз, сосын кіріңіз'); closeAuth(); return; }
+   setUser({email, name: r.data.user.user_metadata?.full_name});
+  } else {
+   const users=jget('demo_users',{});
+   if(authMode==='register'){ if(users[email]) throw new Error('Бұл email тіркелген'); users[email]={pass:btoa(unescape(encodeURIComponent(pass))),name,phone}; localStorage.setItem('demo_users',JSON.stringify(users)); }
+   else if(!users[email] || users[email].pass!==btoa(unescape(encodeURIComponent(pass)))) throw new Error('Email немесе құпиясөз қате');
+   localStorage.setItem('demo_session',email); setUser({email,name:users[email].name});
+  }
+  closeAuth(); showToast('Сәтті кірдіңіз');
+ }catch(err){ showToast(err.message||'Қате'); }
+}
+async function logout(){ if(sb) await sb.auth.signOut(); localStorage.removeItem('demo_session'); setUser(null); showToast('Шықтыңыз'); }
+async function initAuth(){
+ if(sb){ const {data}=await sb.auth.getSession(); if(data.session) setUser({email:data.session.user.email,name:data.session.user.user_metadata?.full_name}); }
+ else { const em=localStorage.getItem('demo_session'), u=jget('demo_users',{})[em]; if(u) setUser({email:em,name:u.name}); }
+}
+
+// ===== ЗАЯВКА: аккаунтпен сақталады =====
+async function handleConsultationSubmit(e){
+ e.preventDefault();
+ const row={name:document.getElementById('consult-name').value, phone:document.getElementById('consult-phone').value, course:document.getElementById('consult-course').value, branch:document.getElementById('consult-branch').value};
+ try{
+  if(sb){ const {data:{user}}=await sb.auth.getUser(); const {error}=await sb.from('applications').insert({...row,user_id:user?user.id:null}); if(error) throw error; }
+  else { const a=jget('demo_applications',[]); a.push({...row,email:currentUser?currentUser.email:null,at:new Date().toISOString()}); localStorage.setItem('demo_applications',JSON.stringify(a)); }
+  closeModal('consultation'); showToast('Рақмет, '+row.name+'! Өтінім қабылданды.'); e.target.reset();
+ }catch(err){ showToast('Қате: '+(err.message||err)); }
+}
+document.addEventListener('DOMContentLoaded',()=>{ fillLists(); renderCourses(COURSES); renderMaterials(); initAuth(); });
+</script>
 </body>
 </html>
